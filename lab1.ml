@@ -42,7 +42,7 @@ exercise2 is a function that returns 42 (instead of failing). When you
 submit, the Exercise 2 unit test should then pass.
 ......................................................................*)
 
-let exercise2 () = failwith "exercise2 not implemented" ;;
+let exercise2 () = 42 ;;
 
 (* Note that your grade on labs is not dependent on your passing the
 unit tests. You'll see that even when a unit test is marked as passed,
@@ -99,7 +99,7 @@ appropriate OCaml expression to assign the value to the variable
 exercise1 below.
 ......................................................................*)
 
-let exercise3 () = failwith "exercise3 not implemented" ;;
+let exercise3 () = -(5 - 3) ;;
 
 (* Hint: The OCaml concrete expression
 
@@ -113,6 +113,17 @@ correspond to. Check it with a member of the course staff if you'd
 like.
 ......................................................................*)
 
+(*    -
+      |
+      |
+      ^
+    /   \ 
+   /     \
+   ~      3
+   |
+   5 
+       *)
+
    
 (*======================================================================
 Part 2: Types and type inference
@@ -124,24 +135,22 @@ expressions below? Test your solution by uncommenting the examples
 error is generated.
 ......................................................................*)
 
-(*   <--- remove this start of comment line
+let exercise5a : int = 42 ;;
 
-let exercise5a : ??? = 42 ;;
-
-let exercise5b : ??? =
+let exercise5b : string =
   let greet y = "Hello " ^ y
   in greet "World!";;
 
-let exercise5c : ???  =
+let exercise5c : int * float -> int  =
   fun (x, y) -> x + int_of_float y ;;
 
-let exercise5d : ??? =
+let exercise5d : int -> bool =
   fun x -> x < x + 1 ;;
 
-let exercise5e : ??? =
+let exercise5e : bool -> bool list =
   fun x -> if x then [x] else [] ;;
 
-remove this end of comment line too ----> *)
+
 
 (*======================================================================
 Part 3: First-order functional programming
@@ -171,17 +180,19 @@ replace the "[]" with the correct functional call.
 ......................................................................*)
 
 let square_all (lst : int list) : int list =
-  failwith "square_all not implemented" ;;
+  List.map (fun x -> x*x) lst;;
 
-let exercise6 = [] ;;
+let exercise6 = square_all [3;4;5] ;;
 
 (*......................................................................
 Exercise 7: Define a recursive function that sums an integer
 list. (What's a sensible return value for the empty list?)
 ......................................................................*)
 
-let sum (lst : int list) : int =
-  failwith "sum not implemented" ;;
+let rec sum (lst : int list) : int =
+  match lst with
+  | [] -> 0
+  | h::t -> h + sum t;;
   
 (*......................................................................
 Exercise 8: Define a recursive function that returns the maximum
@@ -190,8 +201,11 @@ can raise an appropriate exception -- a Match_failure or
 Invalid_argument exception for instance.
 ......................................................................*)
 
-let max_list (lst : int list) : int =
-  failwith "max_list not implemented" ;;
+let rec max_list (lst : int list) : int =
+  match lst with
+  | [] -> raise (Invalid_argument "empty list")
+  | [h] -> h
+  | h::t -> max h (max_list t);;
 
 (*......................................................................
 Exercise 9: Define a function zip, that takes two int lists and
@@ -205,8 +219,13 @@ length lists, to just pad the shorter list with, say, false values, so
 that, zip [1] [2; 3; 4] = [(1, 2); (false, 3); (false, 4)]?
 ......................................................................*)
 
-let zip (x : int list) (y : int list) : (int * int) list =
-  failwith "zip not implemented" ;;
+let rec zip (x : int list) (y : int list) : (int * int) list =
+  if List.length x <> List.length y then raise (Invalid_argument "Length mismatched")
+  else
+    match x, y with
+    |[],[] -> []
+    |h1::t1 , h2::t2 -> (h1, h2)::zip t1 t2;;
+
 
 (*.....................................................................
 Exercise 10: Recall the definition of the function prods from lecture
@@ -237,7 +256,7 @@ let rec prods (lst : (int * int) list) : int list =
   | (x, y) :: tail -> (x * y) :: (prods tail) ;;
 
 let dotprod (a : int list) (b : int list) : int =
-  failwith "dotprod not implemented" ;;
+  sum (prods (zip a b));;
 
 (*======================================================================
 Part 4: High-order functional programming with map, filter, and fold
@@ -295,14 +314,15 @@ Exercise 11: Reimplement sum using fold_left, naming it sum_ho (for
 ......................................................................*)
 
 let sum_ho (lst : int list) : int =
-  failwith "sum_ho not implemented" ;;
+  List.fold_left ( + ) 0 lst;;
+
 
 (*......................................................................
 Exercise 12: Reimplement prods using map.
 ......................................................................*)
 
 let prods_ho (lst : (int * int) list) : int list =
-  failwith "prods_ho not implemented" ;;
+  List.map (fun (x, y) -> x*y) lst;;
   
 (*......................................................................
 Exercise 13: The OCaml List module provides, in addition to the map,
@@ -314,7 +334,7 @@ two lists to form the result list. Use map2 to reimplement zip.
 ......................................................................*)
 
 let zip_ho (x : int list) (y : int list) : (int * int) list =
-  failwith "sum_ho not implemented" ;;
+  List.map2 (fun a b -> (a,b)) x y;;
 
 (*......................................................................
 Exercise 14: Define a function evens, using these higher-order
@@ -322,5 +342,5 @@ functional programming techniques, that returns a list of all of the
 even numbers in its argument list.
 ......................................................................*)
    
-let evens : int list -> int list =
-  fun _ -> failwith "evens not implemented" ;;
+let evens (lst: int list) : int list =
+  List.filter (fun x -> x mod 2 = 0) lst;;
